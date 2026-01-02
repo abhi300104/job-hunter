@@ -15,3 +15,4 @@ export default function SortBar({ sort, onChange }) {
     </div>
   )
 }
+
