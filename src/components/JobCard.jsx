@@ -12,7 +12,6 @@ export default function JobCard({ job, onOpen, selected }) {
     <article
       role="button"
       tabIndex={0}
-      aria-selected={selected ? 'true' : 'false'}
       onKeyDown={handleKey}
       onClick={onOpen}
       className={`
@@ -33,7 +32,7 @@ export default function JobCard({ job, onOpen, selected }) {
         {/* Main Content */}
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-[15px] text-slate-900 leading-tight truncate">
-            {job.title} 
+            {job.title}
           </h3>
 
           <div className="text-xs text-slate-500 mt-1 truncate">
@@ -46,7 +45,7 @@ export default function JobCard({ job, onOpen, selected }) {
             {job.description}
           </p>
 
-          <div className="flex flex-wrap gap-1.5 mt-2 small">
+          <div className="flex flex-wrap gap-1.5 mt-2 text-xs">
             {job.tags.slice(0, 3).map(tag => (
               <span key={tag} className="badge-modern text-xs">
                 {tag}
@@ -62,8 +61,6 @@ export default function JobCard({ job, onOpen, selected }) {
               ? new Date(job.postedDate).toLocaleDateString()
               : ''}
           </div>
-
-          
         </div>
       </div>
     </article>

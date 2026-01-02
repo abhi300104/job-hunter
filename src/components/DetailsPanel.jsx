@@ -9,7 +9,6 @@ export default function DetailsPanel({ job }) {
       {/* Header */}
       <div className="flex items-start justify-between gap-6">
         <div className="flex items-center gap-4">
-          
           <div>
             <h2 className="text-xl font-semibold text-slate-900">
               {job.title}
