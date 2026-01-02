@@ -60,19 +60,26 @@ html, body, #root {
   .btn-primary {
     background: linear-gradient(to right,#2563eb,#1d4ed8);
     color: #fff;
-    padding: 0.5rem 1rem;
+    padding: 0.6rem 1.1rem;
     border-radius: 0.5rem;
     font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
     transition: all 200ms;
+    box-shadow: 0 6px 18px rgba(37,99,235,0.12);
   }
-  .btn-primary:hover { box-shadow: 0 8px 20px rgba(29,78,216,0.18); }
+  .btn-primary:hover { box-shadow: 0 8px 20px rgba(29,78,216,0.18); transform: translateY(-2px); }
   .btn-primary:focus { outline: none; box-shadow: 0 0 0 6px rgba(59,130,246,0.14); }
 
   .btn-secondary {
     color: #475569; /* slate-600 */
-    padding: 0.375rem 0.75rem;
+    padding: 0.5rem 0.9rem;
     border-radius: 0.5rem;
     font-weight: 500;
+    background: transparent;
+    border: 1px solid #e6eef8;
     transition: background 200ms;
   }
   .btn-secondary:hover { background: #f1f5f9; }
@@ -125,13 +132,6 @@ html, body, #root {
     box-sizing: border-box;
   }
 
-  .badge-modern { background:#eef2ff; color:#1e3a8a; padding:0.35rem 0.75rem; border-radius:9999px; font-weight:600; border:1px solid #e6eef8 }
-
-  /* Toned, modern primary/secondary buttons */
-  .btn-primary { padding:0.6rem 1.1rem; border-radius:0.5rem; display:inline-flex; align-items:center; justify-content:center; gap:0.5rem; box-shadow: 0 6px 18px rgba(37,99,235,0.12); }
-  .btn-primary:hover { transform: translateY(-2px); }
-  .btn-secondary { padding:0.5rem 0.9rem; border-radius:0.5rem; background: transparent; border:1px solid #e6eef8 }
-
   .badge-modern {
     display: inline-block;
     padding: 0.25rem 0.75rem;
@@ -161,7 +161,6 @@ html, body, #root {
 
   /* badges container: wrap and keep spacing */
   .badges { display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.5rem; justify-content:center }
-  .badge-modern { margin-right: 0.25rem }
 
   /* ensure card hides overflow so elements stay inside */
   .card-modern { overflow:hidden }

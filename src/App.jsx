@@ -70,8 +70,6 @@ export default function App() {
         </div>
       </div>
 
-
-
       {/* MAIN GRID */}
       <div className="flex flex-1 max-w-7xl mx-auto w-full overflow-hidden">
 
