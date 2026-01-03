@@ -4,16 +4,44 @@ import JobList from './components/JobList'
 import Filters from './components/Filters'
 import SortBar from './components/SortBar'
 import DetailsPanel from './components/DetailsPanel'
-import jobsData from './data/jobs.json'
+
+const API_URL = 'http://localhost:8000'
 
 export default function App() {
-  const [jobs] = useState(jobsData)
+  const [jobs, setJobs] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [filters, setFilters] = useState({ location: '', remote: 'any', type: 'any' })
   const [sort, setSort] = useState('newest')
   const [query, setQuery] = useState('')
   const [selectedJob, setSelectedJob] = useState(null)
 
   const detailsRef = useRef(null)
+
+  // 🌐 Fetch jobs from API
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const response = await fetch(`${API_URL}/api/jobs`)
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        
+        const data = await response.json()
+        setJobs(data)
+      } catch (err) {
+        console.error('Failed to fetch jobs:', err)
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchJobs()
+  }, [])
 
   // 🔍 Filter + sort jobs
   const filteredJobs = useMemo(() => {
@@ -56,6 +84,37 @@ export default function App() {
       setSelectedJob(filteredJobs[0])
     }
   }, [filteredJobs, selectedJob])
+
+  // 🔄 Loading state
+  if (loading) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-slate-50">
+        <div className="text-center">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
+          <p className="mt-4 text-slate-600">Loading jobs...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // ❌ Error state
+  if (error) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-slate-50">
+        <div className="text-center max-w-md p-6 bg-white rounded-lg shadow-md">
+          <div className="text-red-500 text-5xl mb-4">⚠️</div>
+          <h2 className="text-xl font-semibold text-slate-900 mb-2">Failed to Load Jobs</h2>
+          <p className="text-slate-600 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="h-screen flex flex-col bg-slate-50 text-slate-900">
