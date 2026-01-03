@@ -9,84 +9,98 @@ const API_URL = 'http://localhost:8000'
 
 export default function App() {
   const [jobs, setJobs] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [initialLoading, setInitialLoading] = useState(true)
+  const [fetching, setFetching] = useState(false)
   const [error, setError] = useState(null)
   const [filters, setFilters] = useState({ location: '', remote: 'any', type: 'any' })
   const [sort, setSort] = useState('newest')
   const [query, setQuery] = useState('')
   const [selectedJob, setSelectedJob] = useState(null)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [total, setTotal] = useState(0)
 
   const detailsRef = useRef(null)
 
-  // 🌐 Fetch jobs from API
+  // Debounced search term - only updates after user stops typing
+  const [debouncedQuery, setDebouncedQuery] = useState(query)
+  const [debouncedLocation, setDebouncedLocation] = useState(filters.location)
+
+  // Debounce search query (500ms delay)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(query)
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [query])
+
+  // Debounce location filter (500ms delay)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedLocation(filters.location)
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [filters.location])
+
+  // 🌐 Fetch jobs from API with search, filters, and pagination
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        setLoading(true)
+        setFetching(true)
         setError(null)
-        const response = await fetch(`${API_URL}/api/jobs`)
+        
+        // Build query parameters
+        const params = new URLSearchParams()
+        if (debouncedQuery) params.append('q', debouncedQuery)
+        if (debouncedLocation) params.append('location', debouncedLocation)
+        if (filters.remote !== 'any') params.append('remote', filters.remote)
+        if (filters.type !== 'any') params.append('type', filters.type)
+        params.append('sort', sort)
+        params.append('page', page)
+        params.append('page_size', 5)
+        
+        const response = await fetch(`${API_URL}/api/jobs?${params.toString()}`)
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
         }
         
         const data = await response.json()
-        setJobs(data)
+        setJobs(data.jobs)
+        setTotal(data.total)
+        setTotalPages(data.total_pages)
       } catch (err) {
         console.error('Failed to fetch jobs:', err)
         setError(err.message)
       } finally {
-        setLoading(false)
+        setFetching(false)
+        setInitialLoading(false)
       }
     }
 
     fetchJobs()
-  }, [])
+  }, [debouncedQuery, debouncedLocation, filters.remote, filters.type, sort, page])
 
-  // 🔍 Filter + sort jobs
-  const filteredJobs = useMemo(() => {
-    const q = query.trim().toLowerCase()
-
-    let result = jobs.filter(j => {
-      if (
-        q &&
-        !(
-          j.title.toLowerCase().includes(q) ||
-          j.company.toLowerCase().includes(q) ||
-          (j.tags || []).join(' ').toLowerCase().includes(q)
-        )
-      ) return false
-
-      if (filters.location && !j.location.toLowerCase().includes(filters.location.toLowerCase())) return false
-      if (filters.remote === 'yes' && !j.remote) return false
-      if (filters.remote === 'no' && j.remote) return false
-      if (filters.type !== 'any' && j.type !== filters.type) return false
-
-      return true
-    })
-
-    result.sort((a, b) =>
-      sort === 'newest'
-        ? new Date(b.postedDate) - new Date(a.postedDate)
-        : new Date(a.postedDate) - new Date(b.postedDate)
-    )
-
-    return result
-  }, [jobs, query, filters, sort])
+  // Reset to page 1 when filters/search/sort change
+  useEffect(() => {
+    setPage(1)
+  }, [debouncedQuery, debouncedLocation, filters.remote, filters.type, sort])
 
   // ✅ Auto-select first job (LinkedIn behavior)
   useEffect(() => {
-    if (!filteredJobs.length) {
+    if (!jobs.length) {
       setSelectedJob(null)
       return
     }
-    if (!selectedJob || !filteredJobs.some(j => j.id === selectedJob.id)) {
-      setSelectedJob(filteredJobs[0])
+    if (!selectedJob || !jobs.some(j => j.id === selectedJob.id)) {
+      setSelectedJob(jobs[0])
     }
-  }, [filteredJobs, selectedJob])
+  }, [jobs, selectedJob])
 
-  // 🔄 Loading state
-  if (loading) {
+  // 🔄 Initial Loading state (only on first load)
+  if (initialLoading) {
     return (
       <div className="h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center">
@@ -98,7 +112,7 @@ export default function App() {
   }
 
   // ❌ Error state
-  if (error) {
+  if (error && !jobs.length) {
     return (
       <div className="h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center max-w-md p-6 bg-white rounded-lg shadow-md">
@@ -134,16 +148,45 @@ export default function App() {
 
         {/* LEFT COLUMN – Job List */}
         <aside className="w-[45%] border-r border-slate-200 overflow-y-auto p-4 space-y-4">
-
+          {/* Pagination Info */}
+          {jobs.length > 0 && (
+            <div className="text-sm text-slate-600 mb-2 flex items-center justify-between">
+              <span>Showing {jobs.length} of {total} jobs (Page {page} of {totalPages})</span>
+              {fetching && <span className="text-blue-600 text-xs">Updating...</span>}
+            </div>
+          )}
 
           <JobList
-            jobs={filteredJobs}
+            jobs={jobs}
             selectedId={selectedJob?.id}
             onOpen={(job) => {
               setSelectedJob(job)
               detailsRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
             }}
           />
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 pt-4 pb-2">
+              <button
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed"
+              >
+                Previous
+              </button>
+              <span className="px-4 py-2 text-slate-700">
+                Page {page} of {totalPages}
+              </span>
+              <button
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed"
+              >
+                Next
+              </button>
+            </div>
+          )}
         </aside>
 
         {/* RIGHT COLUMN – Job Details */}
