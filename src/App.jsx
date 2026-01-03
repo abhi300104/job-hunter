@@ -8,9 +8,31 @@ import DetailsPanel from './components/DetailsPanel'
 const API_URL = 'http://localhost:8000'
 const PAGE_SIZE = 5
 
+// Helper function to get pagination range
+function getPaginationRange(currentPage, totalPages, maxVisible = 5) {
+  if (totalPages <= maxVisible) {
+    return Array.from({ length: totalPages }, (_, i) => i + 1)
+  }
+  
+  if (currentPage <= 3) {
+    return Array.from({ length: maxVisible }, (_, i) => i + 1)
+  }
+  
+  if (currentPage >= totalPages - 2) {
+    return Array.from({ length: maxVisible }, (_, i) => totalPages - maxVisible + 1 + i)
+  }
+  
+  return Array.from({ length: maxVisible }, (_, i) => currentPage - 2 + i)
+}
+
 // Custom hook for media query
 function useMediaQuery(query) {
-  const [matches, setMatches] = useState(false)
+  const [matches, setMatches] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.matchMedia(query).matches
+    }
+    return false
+  })
   
   useEffect(() => {
     const media = window.matchMedia(query)
@@ -163,7 +185,9 @@ export default function App() {
             <div className="inline-block h-2 w-32 bg-gradient-to-r from-blue-200 via-purple-200 to-cyan-200 rounded-full overflow-hidden">
               <div className="h-full bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-600 rounded-full animate-pulse" style={{ width: '60%' }}></div>
             </div>
-            <p className="text-slate-700 font-semibold">✨ Loading amazing opportunities...</p>
+            <p className="text-slate-700 font-semibold">
+              <span aria-hidden="true">✨</span> Loading amazing opportunities...
+            </p>
           </div>
         </div>
       </div>
@@ -202,7 +226,7 @@ export default function App() {
       
       {/* FILTER + SORT TOOLBAR */}
       <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md">
-        <div className="flex items-center justify-between overflow-x-hidden">
+        <div className="flex items-center justify-between">
           <Filters filters={filters} onChange={setFilters} />
           <div className="pr-4 hidden sm:block flex-shrink-0">
             <SortBar sort={sort} onChange={setSort} />
@@ -256,31 +280,19 @@ export default function App() {
               </button>
               
               <div className="flex items-center gap-1">
-                {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                  let pageNum
-                  if (totalPages <= 5) {
-                    pageNum = i + 1
-                  } else if (page <= 3) {
-                    pageNum = i + 1
-                  } else if (page >= totalPages - 2) {
-                    pageNum = totalPages - 4 + i
-                  } else {
-                    pageNum = page - 2 + i
-                  }
-                  return (
-                    <button
-                      key={pageNum}
-                      onClick={() => setPage(pageNum)}
-                      className={`w-9 h-9 rounded-lg font-semibold text-sm transition-all ${
-                        page === pageNum 
-                          ? 'bg-gradient-to-br from-sky-500 to-purple-500 text-white shadow-md' 
-                          : 'text-slate-600 hover:bg-slate-100 border border-transparent hover:border-slate-200'
-                      }`}
-                    >
-                      {pageNum}
-                    </button>
-                  )
-                })}
+                {getPaginationRange(page, totalPages, 5).map(pageNum => (
+                  <button
+                    key={pageNum}
+                    onClick={() => setPage(pageNum)}
+                    className={`w-9 h-9 rounded-lg font-semibold text-sm transition-all ${
+                      page === pageNum 
+                        ? 'bg-gradient-to-br from-sky-500 to-purple-500 text-white shadow-md' 
+                        : 'text-slate-600 hover:bg-slate-100 border border-transparent hover:border-slate-200'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
               </div>
 
               <button

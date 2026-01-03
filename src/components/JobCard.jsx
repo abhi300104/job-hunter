@@ -1,6 +1,8 @@
 import React from 'react'
 
 // Badge color variants based on tag content
+// Note: For tags with multiple keywords (e.g., "React Node Developer"),
+// the first matching keyword determines the badge color
 const getBadgeVariant = (tag) => {
   const tagLower = tag.toLowerCase()
   if (tagLower.includes('react') || tagLower.includes('vue') || tagLower.includes('angular')) return 'badge-blue'
@@ -81,7 +83,7 @@ export default function JobCard({ job, onOpen, selected }) {
             <span className="font-medium text-slate-700">{job.company}</span>
             <span className="w-1 h-1 rounded-full bg-slate-300"></span>
             <span className="flex items-center gap-1 text-slate-500">
-              <svg style={{ width: '13px', height: '13px', flexShrink: 0 }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg className="icon-sm-13" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               </svg>
               {job.location}
@@ -92,7 +94,7 @@ export default function JobCard({ job, onOpen, selected }) {
           <div className="flex items-center gap-2 mt-2.5">
             {job.salary && (
               <span className="inline-flex items-center gap-1 text-[12px] font-semibold text-emerald-700 bg-gradient-to-r from-emerald-50/80 to-teal-50/80 px-2.5 py-1 rounded-lg shadow-sm">
-                <svg style={{ width: '12px', height: '12px', flexShrink: 0 }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <svg className="icon-xs" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 {job.salary}

@@ -20,8 +20,8 @@ export default function SortBar({ sort, onChange }) {
         value={sort}
         onChange={e => onChange(e.target.value)}
       >
-        <option value="newest">🕐 Newest first</option>
-        <option value="oldest">📅 Oldest first</option>
+        <option value="newest">Newest first</option>
+        <option value="oldest">Oldest first</option>
       </select>
     </div>
   )

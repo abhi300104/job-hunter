@@ -1,75 +1,84 @@
 import React, { useState } from 'react'
 
-// SVG Icons as components - using consistent visible sizes with inline styles
+// SVG Icons as components - using consistent visible sizes with CSS classes
 const Icons = {
   Briefcase: () => (
-    <svg style={{ width: '18px', height: '18px', flexShrink: 0 }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <svg className="icon-lg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
     </svg>
   ),
   Location: () => (
-    <svg style={{ width: '16px', height: '16px', flexShrink: 0 }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <svg className="icon-md" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
     </svg>
   ),
   Money: () => (
-    <svg style={{ width: '18px', height: '18px', flexShrink: 0 }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <svg className="icon-lg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
   ),
   Clock: () => (
-    <svg style={{ width: '16px', height: '16px', flexShrink: 0 }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <svg className="icon-md" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
   ),
   Home: () => (
-    <svg style={{ width: '18px', height: '18px', flexShrink: 0 }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <svg className="icon-lg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
     </svg>
   ),
   Check: () => (
-    <svg style={{ width: '18px', height: '18px', flexShrink: 0 }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <svg className="icon-lg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
     </svg>
   ),
   Star: () => (
-    <svg style={{ width: '18px', height: '18px', flexShrink: 0 }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <svg className="icon-lg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
     </svg>
   ),
   Building: () => (
-    <svg style={{ width: '18px', height: '18px', flexShrink: 0 }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <svg className="icon-lg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
     </svg>
   ),
   Heart: ({ filled }) => (
-    <svg style={{ width: '16px', height: '16px', flexShrink: 0 }} fill={filled ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor">
+    <svg className="icon-md" fill={filled ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
     </svg>
   ),
   ExternalLink: () => (
-    <svg style={{ width: '14px', height: '14px', flexShrink: 0 }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <svg className="icon-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
     </svg>
   ),
   Users: () => (
-    <svg style={{ width: '16px', height: '16px', flexShrink: 0 }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <svg className="icon-md" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
     </svg>
   ),
 }
 
 // Badge color variants based on content
-const getBadgeVariant = (tag, index) => {
-  const variants = ['badge-blue', 'badge-teal', 'badge-purple', 'badge-amber', 'badge-emerald', 'badge-rose']
-  return variants[index % variants.length]
+// Note: For tags with multiple keywords (e.g., "React Node Developer"),
+// the first matching keyword determines the badge color
+const getBadgeVariant = (tag) => {
+  if (!tag) return 'badge-slate'
+  
+  const tagLower = tag.toLowerCase()
+  if (tagLower.includes('react') || tagLower.includes('vue') || tagLower.includes('angular')) return 'badge-blue'
+  if (tagLower.includes('python') || tagLower.includes('django') || tagLower.includes('flask')) return 'badge-teal'
+  if (tagLower.includes('node') || tagLower.includes('express') || tagLower.includes('javascript')) return 'badge-amber'
+  if (tagLower.includes('aws') || tagLower.includes('cloud') || tagLower.includes('devops')) return 'badge-purple'
+  if (tagLower.includes('sql') || tagLower.includes('database') || tagLower.includes('postgres')) return 'badge-emerald'
+  if (tagLower.includes('design') || tagLower.includes('ui') || tagLower.includes('ux')) return 'badge-rose'
+  return 'badge-slate'
 }
 
 export default function DetailsPanel({ job, onClose, isMobile = false }) {
   const [saved, setSaved] = useState(false)
   const [companyInfo, setCompanyInfo] = useState(null)
-  const [companyLoading, setCompanyLoading] = useState(false)
 
   if (!job) return null
 
@@ -81,18 +90,24 @@ export default function DetailsPanel({ job, onClose, isMobile = false }) {
   React.useEffect(() => {
     let mounted = true
     async function fetchCompany() {
-      setCompanyLoading(true)
       setCompanyInfo(null)
       try {
         const res = await fetch(`/api/companies/${encodeURIComponent(job.company)}`)
-        if (!res.ok) throw new Error('Not found')
+        if (!res.ok) {
+          throw new Error(`Company lookup failed with status ${res.status}`)
+        }
+        const contentType = res.headers && res.headers.get
+          ? res.headers.get('content-type') || ''
+          : ''
+        if (!contentType.toLowerCase().includes('application/json')) {
+          throw new Error(`Unexpected content type for company lookup: ${contentType}`)
+        }
         const data = await res.json()
         if (mounted) setCompanyInfo(data)
       } catch (e) {
         // If company endpoint not available or fails, keep fallback behavior
+        console.error('Failed to fetch company info for', job.company, e)
         if (mounted) setCompanyInfo(null)
-      } finally {
-        if (mounted) setCompanyLoading(false)
       }
     }
     fetchCompany()
@@ -214,7 +229,7 @@ export default function DetailsPanel({ job, onClose, isMobile = false }) {
           </h3>
           <div className="flex flex-wrap gap-2">
             {job.tags?.map((tag, index) => (
-              <span key={tag} className={`badge text-[11px] px-2.5 py-1 font-medium ${getBadgeVariant(tag, index)}`}>
+              <span key={tag} className={`badge text-[11px] px-2.5 py-1 font-medium ${getBadgeVariant(tag)}`}>
                 {tag}
               </span>
             ))}

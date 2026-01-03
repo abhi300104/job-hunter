@@ -63,7 +63,6 @@ export default function JobList({ jobs, onOpen, selectedId, loading }) {
           job={job} 
           onOpen={() => onOpen(job)} 
           selected={job.id === selectedId}
-          style={{ animationDelay: `${index * 50}ms` }}
         />
       ))}
     </div>

@@ -67,6 +67,7 @@ def load_companies():
     if os.path.exists(json_path):
         with open(json_path, "r", encoding="utf-8") as f:
             return json.load(f)
+    # If the optional companies.json file is missing, intentionally fall back to an empty list.
     return []
 
 @app.get("/")
@@ -273,7 +274,10 @@ def get_company(company_name: str):
     locations = sorted({j.get("location") for j in matches if j.get("location")})
     tags = sorted({t for j in matches for t in j.get("tags", [])})
     logo = matches[0].get("logoUrl")
-    overview = matches[0].get("companyOverview") or (f"{matches[0].get('company')} is a mission-driven company hiring across {', '.join(locations[:2]) if locations else 'multiple locations'}.")
+    location_text = ", ".join(locations[:2]) if locations else "multiple locations"
+    overview = matches[0].get("companyOverview") or (
+        f"{matches[0].get('company')} is a mission-driven company hiring across {location_text}."
+    )
     return {
         "name": matches[0].get("company"),
         "overview": overview,
