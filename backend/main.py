@@ -3,14 +3,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from elasticsearch import Elasticsearch
 from typing import Optional
 from enum import Enum
+from contextlib import asynccontextmanager
 import json
 import os
 
 class SortOrder(str, Enum):
     newest = "newest"
     oldest = "oldest"
-
-app = FastAPI(title="Job Hunter API", version="1.0.0")
 
 # Elasticsearch client will be initialized lazily
 es = None
@@ -27,8 +26,8 @@ def get_es_client():
         )
     return es
 
-@app.on_event("startup")
-async def startup_event():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     """Check Elasticsearch connection on startup"""
     try:
         client = get_es_client()
@@ -38,6 +37,10 @@ async def startup_event():
             print("⚠ Warning: Cannot connect to Elasticsearch. Falling back to JSON data.")
     except Exception as e:
         print(f"⚠ Warning: Elasticsearch connection failed: {e}. Falling back to JSON data.")
+    yield
+    # Cleanup on shutdown (if needed)
+
+app = FastAPI(title="Job Hunter API", version="1.0.0", lifespan=lifespan)
 
 # Elasticsearch index name
 INDEX_NAME = "jobs"

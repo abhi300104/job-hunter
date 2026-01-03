@@ -59,7 +59,7 @@ export default function App() {
         if (debouncedQuery) params.append('q', debouncedQuery)
         if (debouncedLocation) params.append('location', debouncedLocation)
         if (filters.remote !== 'any') params.append('remote', filters.remote)
-        if (filters.type !== 'any') params.append('type', filters.type)
+        if (filters.type !== 'any') params.append('job_type', filters.type)
         params.append('sort', sort)
         params.append('page', page)
         params.append('page_size', PAGE_SIZE)
