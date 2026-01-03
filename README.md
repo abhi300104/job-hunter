@@ -12,7 +12,7 @@ Job Hunter consists of two main components:
 
 ### Quick Start
 
-1. Install dependencies: 
+1. Install dependencies:
 
 ```bash
 npm install
@@ -62,7 +62,7 @@ npm run preview
 
 ### Installation
 
-1. Navigate to the backend directory: 
+1. Navigate to the backend directory:
 ```bash
 cd backend
 ```
@@ -113,7 +113,7 @@ npm install  # if not already done
 npm run dev
 ```
 
-3. Access the application: 
+3. Access the application:
    - Frontend: http://localhost:5173
    - Backend API: http://localhost:8000
    - API Docs: http://localhost:8000/docs
