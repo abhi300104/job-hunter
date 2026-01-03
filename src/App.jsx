@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Header from './components/Header'
 import JobList from './components/JobList'
 import Filters from './components/Filters'
@@ -6,6 +6,7 @@ import SortBar from './components/SortBar'
 import DetailsPanel from './components/DetailsPanel'
 
 const API_URL = 'http://localhost:8000'
+const PAGE_SIZE = 5
 
 export default function App() {
   const [jobs, setJobs] = useState([])
@@ -44,8 +45,10 @@ export default function App() {
     return () => clearTimeout(timer)
   }, [filters.location])
 
-  // 🌐 Fetch jobs from API with search, filters, and pagination
+  // 🌐 Fetch jobs from API when debounced search/filters or pagination change
   useEffect(() => {
+    const abortController = new AbortController()
+    
     const fetchJobs = async () => {
       try {
         setFetching(true)
@@ -59,9 +62,11 @@ export default function App() {
         if (filters.type !== 'any') params.append('type', filters.type)
         params.append('sort', sort)
         params.append('page', page)
-        params.append('page_size', 5)
+        params.append('page_size', PAGE_SIZE)
         
-        const response = await fetch(`${API_URL}/api/jobs?${params.toString()}`)
+        const response = await fetch(`${API_URL}/api/jobs?${params.toString()}`, {
+          signal: abortController.signal
+        })
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
@@ -72,7 +77,12 @@ export default function App() {
         setTotal(data.total)
         setTotalPages(data.total_pages)
       } catch (err) {
+        if (err.name === 'AbortError') {
+          // Request was cancelled, do nothing
+          return
+        }
         console.error('Failed to fetch jobs:', err)
+        setJobs([])
         setError(err.message)
       } finally {
         setFetching(false)
@@ -81,6 +91,10 @@ export default function App() {
     }
 
     fetchJobs()
+    
+    return () => {
+      abortController.abort()
+    }
   }, [debouncedQuery, debouncedLocation, filters.remote, filters.type, sort, page])
 
   // Reset to page 1 when filters/search/sort change
@@ -151,7 +165,9 @@ export default function App() {
           {/* Pagination Info */}
           {jobs.length > 0 && (
             <div className="text-sm text-slate-600 mb-2 flex items-center justify-between">
-              <span>Showing {jobs.length} of {total} jobs (Page {page} of {totalPages})</span>
+              <span>
+                Showing {((page - 1) * PAGE_SIZE) + 1}-{Math.min(page * PAGE_SIZE, total)} of {total} jobs
+              </span>
               {fetching && <span className="text-blue-600 text-xs">Updating...</span>}
             </div>
           )}

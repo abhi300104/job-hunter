@@ -4,7 +4,7 @@ Run this script once to populate Elasticsearch with job data
 Usage: python migrate_data.py
 """
 
-from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch, helpers
 import json
 import os
 
@@ -24,7 +24,13 @@ INDEX_MAPPING = {
             "id": {"type": "keyword"},
             "title": {"type": "text", "fields": {"keyword": {"type": "keyword"}}},
             "company": {"type": "text", "fields": {"keyword": {"type": "keyword"}}},
-            "location": {"type": "text", "fields": {"keyword": {"type": "keyword"}}},
+            "location": {
+                "type": "text",
+                "fields": {
+                    "keyword": {"type": "keyword"}
+                },
+                "analyzer": "standard"
+            },
             "remote": {"type": "boolean"},
             "type": {"type": "keyword"},
             "salary": {"type": "text"},
@@ -54,7 +60,7 @@ def migrate():
         print(f"✓ Deleted existing index '{INDEX_NAME}'")
     
     # Create index with mapping
-    es.indices.create(index=INDEX_NAME, body=INDEX_MAPPING)
+    es.indices.create(index=INDEX_NAME, mappings=INDEX_MAPPING["mappings"])
     print(f"✓ Created index '{INDEX_NAME}' with mapping")
     
     # Load jobs from JSON
@@ -64,11 +70,18 @@ def migrate():
     
     print(f"✓ Loaded {len(jobs)} jobs from {json_path}")
     
-    # Bulk index jobs
-    indexed_count = 0
-    for job in jobs:
-        es.index(index=INDEX_NAME, id=job["id"], document=job)
-        indexed_count += 1
+    # Bulk index jobs using helpers.bulk for efficiency
+    actions = [
+        {
+            "_index": INDEX_NAME,
+            "_id": job["id"],
+            "_source": job
+        }
+        for job in jobs
+    ]
+    
+    success, failed = helpers.bulk(es, actions, raise_on_error=False, stats_only=False)
+    indexed_count = success
     
     # Refresh index to make documents searchable immediately
     es.indices.refresh(index=INDEX_NAME)

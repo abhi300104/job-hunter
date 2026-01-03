@@ -1,5 +1,21 @@
-ECHO is on.
-node_modules/*
-dist/*
-build/*
-els
+node_modules/
+dist/
+build/
+
+# Python virtual environment
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Environment variables
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
