@@ -80,11 +80,10 @@ def migrate():
         for job in jobs
     ]
     
-    # When stats_only=False, bulk returns (success_count, errors_list)
-    indexed_count, errors = helpers.bulk(es, actions, raise_on_error=False, stats_only=True)
+    # When stats_only=True, bulk returns only the count of successful operations
+    indexed_count = helpers.bulk(es, actions, raise_on_error=False, stats_only=True)[0]
     
-    # If we want detailed errors, we need to set stats_only=False
-    # and handle the return format differently
+    # Check if all documents were indexed successfully
     if indexed_count != len(jobs):
         print(f"⚠ Warning: Only {indexed_count} out of {len(jobs)} documents were indexed successfully")
     
