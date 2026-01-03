@@ -102,7 +102,7 @@ html, body, #root {
     font-size: 0.875rem;
     font-weight: 400;
     line-height: 1.5;
-    transition: all var(--transition-base);
+    transition: border-color var(--transition-base), box-shadow var(--transition-base);
     box-shadow: var(--shadow-xs);
   }
   .input-modern:focus {
@@ -146,7 +146,7 @@ html, body, #root {
     font-size: 0.875rem;
     font-weight: 400;
     line-height: 1.5;
-    transition: all var(--transition-base);
+    transition: border-color var(--transition-base), box-shadow var(--transition-base);
     box-shadow: var(--shadow-xs);
     cursor: pointer;
     appearance: none;
@@ -158,7 +158,7 @@ html, body, #root {
   .select-modern:focus {
     outline: none;
     border-color: var(--color-primary-500);
-    box-shadow: 0 0 0 4px rgba(59,130,246,0.1), var(--shadow-sm);
+    box-shadow: 0 0 0 4px rgba(14,165,233,0.1), var(--shadow-sm);
   }
   .select-modern:hover:not(:focus) {
     border-color: var(--color-slate-300);
@@ -179,7 +179,7 @@ html, body, #root {
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    transition: all var(--transition-base);
+    transition: background-position var(--transition-base), box-shadow var(--transition-base), transform var(--transition-base);
     box-shadow: 0 4px 14px rgba(59,130,246,0.3), 0 0 20px rgba(139,92,246,0.1);
     border: none;
     cursor: pointer;
@@ -218,7 +218,7 @@ html, body, #root {
     font-size: 0.875rem;
     background: white;
     border: 1px solid rgba(226, 232, 240, 0.7);
-    transition: all var(--transition-base);
+    transition: background-color var(--transition-base), border-color var(--transition-base), color var(--transition-base), box-shadow var(--transition-base);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -251,7 +251,7 @@ html, body, #root {
     background: transparent;
     border: none;
     color: var(--color-slate-500);
-    transition: all var(--transition-fast);
+    transition: background-color var(--transition-fast), color var(--transition-fast);
     cursor: pointer;
   }
   .btn-icon:hover {
@@ -268,7 +268,7 @@ html, body, #root {
     box-shadow: var(--shadow-xs);
     /* subtle and clean look: rely on shadow rather than visible borders */
     border: none;
-    transition: all var(--transition-base);
+    transition: box-shadow var(--transition-base), transform var(--transition-base);
   }
   .card-modern:hover {
     box-shadow: var(--shadow-md);
@@ -310,7 +310,38 @@ html, body, #root {
     font-size: 0.6875rem;
     font-weight: 500;
     line-height: 1.4;
-    transition: all var(--transition-fast);
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+  }
+
+  /* Icon size utilities */
+  .icon-xs {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+  }
+
+  .icon-sm {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  .icon-sm-13 {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+  }
+
+  .icon-md {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  .icon-lg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
   }
   
   .badge-blue {
@@ -452,7 +483,7 @@ html, body, #root {
     font-weight: 500;
     color: var(--color-slate-600);
     cursor: pointer;
-    transition: all var(--transition-fast);
+    transition: border-color var(--transition-fast), background-color var(--transition-fast), transform var(--transition-fast);
   }
   .filter-chip:hover {
     border-color: var(--color-primary-300);
@@ -580,7 +611,7 @@ html, body, #root {
     white-space: nowrap;
     opacity: 0;
     visibility: hidden;
-    transition: all var(--transition-fast);
+    transition: opacity var(--transition-fast), visibility var(--transition-fast);
     pointer-events: none;
     z-index: 50;
   }
@@ -679,7 +710,7 @@ html, body, #root {
     z-index: 40;
     opacity: 0;
     visibility: hidden;
-    transition: all var(--transition-base);
+    transition: opacity var(--transition-base), visibility var(--transition-base);
   }
   .mobile-overlay.open {
     opacity: 1;
@@ -704,7 +735,6 @@ html, body, #root {
     justify-content: center;
     color: var(--color-slate-400);
   }
-  }
 
 
   /* Meta colors */
@@ -724,4 +754,5 @@ html, body, #root {
   /* Details panel tweaks */
   .details-panel { max-height: calc(100vh - 220px); overflow:auto; -webkit-overflow-scrolling: touch; padding-right: 0.25rem }
   .details-panel :where(h2, p) { word-break: break-word }
+}
 

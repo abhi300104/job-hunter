@@ -79,8 +79,8 @@ export default function Filters({ filters, onChange }) {
             onChange={e => set({ remote: e.target.value })}
           >
             <option value="any">All work modes</option>
-            <option value="yes">🏠 Remote</option>
-            <option value="no">🏢 On-site</option>
+            <option value="yes">Remote</option>
+            <option value="no">On-site</option>
           </select>
         </div>
 
@@ -92,9 +92,9 @@ export default function Filters({ filters, onChange }) {
             onChange={e => set({ type: e.target.value })}
           >
             <option value="any">All job types</option>
-            <option value="Full-time">💼 Full-time</option>
-            <option value="Contract">📝 Contract</option>
-            <option value="Part-time">⏰ Part-time</option>
+            <option value="Full-time">Full-time</option>
+            <option value="Contract">Contract</option>
+            <option value="Part-time">Part-time</option>
           </select>
         </div>
 

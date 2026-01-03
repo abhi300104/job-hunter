@@ -51,8 +51,8 @@ export default function Header({ query, setQuery }) {
             </div>
           </div>
           <div className="hidden sm:block">
-            <h1 className="text-lg font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-600 bg-clip-text text-transparent leading-tight">JobHunter</h1>
-            <p className="text-xs text-slate-500">🚀 Find your dream job</p>
+            <h1 className="text-lg font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-600 bg-clip-text text-transparent leading-tight">Job Hunter</h1>
+            <p className="text-xs text-slate-500">Find your dream job</p>
           </div>
         </div>
 
