@@ -1,9 +1,14 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from elasticsearch import Elasticsearch
 from typing import Optional
+from enum import Enum
 import json
 import os
+
+class SortOrder(str, Enum):
+    newest = "newest"
+    oldest = "oldest"
 
 app = FastAPI(title="Job Hunter API", version="1.0.0")
 
@@ -64,7 +69,7 @@ def get_jobs(
     location: Optional[str] = Query(None, description="Filter by location"),
     remote: Optional[str] = Query(None, description="Filter by remote status: 'yes', 'no', or 'any'"),
     job_type: Optional[str] = Query(None, description="Filter by job type: 'Full-time', 'Contract', 'Part-time', or 'any'"),
-    sort: str = Query("newest", regex="^(newest|oldest)$", description="Sort order: 'newest' or 'oldest'"),
+    sort: SortOrder = Query(SortOrder.newest, description="Sort order: 'newest' or 'oldest'"),
     page: int = Query(1, ge=1, description="Page number (starts at 1)"),
     page_size: int = Query(5, ge=1, le=100, description="Number of jobs per page")
 ):
@@ -92,10 +97,9 @@ def get_jobs(
     # Location filter (case-insensitive match using text field)
     if location:
         must_conditions.append({
-            "match": {
+            "match_phrase": {
                 "location": {
-                    "query": location,
-                    "operator": "and"
+                    "query": location
                 }
             }
         })
@@ -130,7 +134,7 @@ def get_jobs(
     
     # Sort order
     sort_order = [
-        {"postedDate": {"order": "desc" if sort == "newest" else "asc"}}
+        {"postedDate": {"order": "desc" if sort == SortOrder.newest else "asc"}}
     ]
     
     # If there's a text search, add relevance score as primary sort
@@ -219,7 +223,7 @@ def get_jobs(
             ]
 
         # Sort by postedDate (newest or oldest)
-        reverse = sort == "newest"
+        reverse = sort == SortOrder.newest
         filtered_jobs.sort(key=lambda job: job.get("postedDate") or "", reverse=reverse)
 
         # Pagination

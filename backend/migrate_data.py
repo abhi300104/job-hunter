@@ -80,8 +80,14 @@ def migrate():
         for job in jobs
     ]
     
-    success, failed = helpers.bulk(es, actions, raise_on_error=False, stats_only=False)
+    success, errors = helpers.bulk(es, actions, raise_on_error=False, stats_only=False)
     indexed_count = success
+    
+    # Log any failed documents
+    if errors:
+        print(f"⚠ Warning: {len(errors)} documents failed to index")
+        for error in errors[:5]:  # Show first 5 errors
+            print(f"  - Error: {error}")
     
     # Refresh index to make documents searchable immediately
     es.indices.refresh(index=INDEX_NAME)
