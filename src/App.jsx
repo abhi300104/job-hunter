@@ -226,7 +226,7 @@ export default function App() {
       
       {/* FILTER + SORT TOOLBAR */}
       <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md">
-        <div className="flex items-center justify-between overflow-x-hidden">
+        <div className="flex items-center justify-between">
           <Filters filters={filters} onChange={setFilters} />
           <div className="pr-4 hidden sm:block flex-shrink-0">
             <SortBar sort={sort} onChange={setSort} />

@@ -61,6 +61,8 @@ const Icons = {
 }
 
 // Badge color variants based on content
+// Note: For tags with multiple keywords (e.g., "React Node Developer"),
+// the first matching keyword determines the badge color
 const getBadgeVariant = (tag) => {
   if (!tag) return 'badge-slate'
   

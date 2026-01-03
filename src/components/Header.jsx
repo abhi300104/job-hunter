@@ -40,11 +40,11 @@ const Icons = {
 
 export default function Header({ query, setQuery }) {
   return (
-    <header className="bg-white/95 backdrop-blur-xl sticky top-0 z-20 overflow-x-hidden">
+    <header className="bg-white/95 backdrop-blur-xl sticky top-0 z-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-2 sm:gap-6">
         {/* Logo & Brand */}
         <div className="flex items-center gap-2 sm:gap-3.5 flex-shrink-0">
-          <div className="relative">
+          <div className="relative overflow-hidden rounded-xl">
             <div className="absolute inset-0 bg-gradient-to-br from-sky-400 via-purple-400 to-cyan-400 rounded-xl blur-md opacity-40"></div>
             <div className="relative bg-white rounded-xl p-1 shadow-sm">
               <JobHunterLogo />

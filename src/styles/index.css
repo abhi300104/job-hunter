@@ -266,8 +266,8 @@ html, body, #root {
     background: white;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-xs);
-    /* subtle and clean look: rely on shadow rather than visible borders */
-    border: none;
+    /* subtle and clean look with a very light border for clarity */
+    border: 1px solid rgba(15,23,42,0.06);
     transition: box-shadow var(--transition-base), transform var(--transition-base);
   }
   .card-modern:hover {

@@ -1,6 +1,8 @@
 import React from 'react'
 
 // Badge color variants based on tag content
+// Note: For tags with multiple keywords (e.g., "React Node Developer"),
+// the first matching keyword determines the badge color
 const getBadgeVariant = (tag) => {
   const tagLower = tag.toLowerCase()
   if (tagLower.includes('react') || tagLower.includes('vue') || tagLower.includes('angular')) return 'badge-blue'
