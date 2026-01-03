@@ -61,6 +61,15 @@ def load_jobs():
     with open(json_path, "r", encoding="utf-8") as f:
         return json.load(f)
 
+# Load companies metadata (optional file)
+def load_companies():
+    json_path = os.path.join(os.path.dirname(__file__), "data", "companies.json")
+    if os.path.exists(json_path):
+        with open(json_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    # If the optional companies.json file is missing, intentionally fall back to an empty list.
+    return []
+
 @app.get("/")
 def root():
     """Root endpoint"""
@@ -245,6 +254,39 @@ def get_jobs(
             "has_next": page < total_pages,
             "has_prev": page > 1
         }
+
+@app.get("/api/companies/{company_name}")
+def get_company(company_name: str):
+    """Return company metadata if available; falls back to derived info from jobs"""
+    companies = load_companies()
+    # Try exact match first (case-insensitive)
+    for c in companies:
+        if c.get("name", "").lower() == company_name.lower():
+            return c
+
+    # Fallback: derive from jobs data
+    jobs = load_jobs()
+    matches = [j for j in jobs if j.get("company", "").lower() == company_name.lower()]
+    if not matches:
+        raise HTTPException(status_code=404, detail="Company not found")
+
+    # Derive a minimal company object
+    locations = sorted({j.get("location") for j in matches if j.get("location")})
+    tags = sorted({t for j in matches for t in j.get("tags", [])})
+    logo = matches[0].get("logoUrl")
+    location_text = ", ".join(locations[:2]) if locations else "multiple locations"
+    overview = matches[0].get("companyOverview") or (
+        f"{matches[0].get('company')} is a mission-driven company hiring across {location_text}."
+    )
+    return {
+        "name": matches[0].get("company"),
+        "overview": overview,
+        "employees": None,
+        "locations": locations,
+        "tags": tags,
+        "logoUrl": logo
+    }
+
 
 @app.get("/health")
 def health_check():

@@ -8,6 +8,45 @@ import DetailsPanel from './components/DetailsPanel'
 const API_URL = 'http://localhost:8000'
 const PAGE_SIZE = 5
 
+// Helper function to get pagination range
+function getPaginationRange(currentPage, totalPages, maxVisible = 5) {
+  if (totalPages <= maxVisible) {
+    return Array.from({ length: totalPages }, (_, i) => i + 1)
+  }
+  
+  if (currentPage <= 3) {
+    return Array.from({ length: maxVisible }, (_, i) => i + 1)
+  }
+  
+  if (currentPage >= totalPages - 2) {
+    return Array.from({ length: maxVisible }, (_, i) => totalPages - maxVisible + 1 + i)
+  }
+  
+  return Array.from({ length: maxVisible }, (_, i) => currentPage - 2 + i)
+}
+
+// Custom hook for media query
+function useMediaQuery(query) {
+  const [matches, setMatches] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.matchMedia(query).matches
+    }
+    return false
+  })
+  
+  useEffect(() => {
+    const media = window.matchMedia(query)
+    if (media.matches !== matches) {
+      setMatches(media.matches)
+    }
+    const listener = () => setMatches(media.matches)
+    media.addEventListener('change', listener)
+    return () => media.removeEventListener('change', listener)
+  }, [matches, query])
+  
+  return matches
+}
+
 export default function App() {
   const [jobs, setJobs] = useState([])
   const [initialLoading, setInitialLoading] = useState(true)
@@ -20,8 +59,10 @@ export default function App() {
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [total, setTotal] = useState(0)
+  const [mobileDetailOpen, setMobileDetailOpen] = useState(false)
 
   const detailsRef = useRef(null)
+  const isMobile = useMediaQuery('(max-width: 1023px)')
 
   // Debounced search term - only updates after user stops typing
   const [debouncedQuery, setDebouncedQuery] = useState(query)
@@ -113,13 +154,41 @@ export default function App() {
     }
   }, [jobs, selectedJob])
 
+  // Handle job selection with mobile panel
+  const handleSelectJob = (job) => {
+    setSelectedJob(job)
+    if (isMobile) {
+      setMobileDetailOpen(true)
+    }
+    detailsRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  // Close mobile panel
+  const closeMobileDetail = () => {
+    setMobileDetailOpen(false)
+  }
+
   // 🔄 Initial Loading state (only on first load)
   if (initialLoading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
-          <p className="mt-4 text-slate-600">Loading jobs...</p>
+      <div className="h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-cyan-50">
+        <div className="text-center animate-fade-in">
+          <div className="relative w-20 h-20 mx-auto mb-6">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-400 via-purple-400 to-cyan-400 rounded-2xl blur-xl opacity-60 animate-pulse"></div>
+            <div className="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-600 via-purple-600 to-cyan-600 flex items-center justify-center shadow-2xl">
+              <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="inline-block h-2 w-32 bg-gradient-to-r from-blue-200 via-purple-200 to-cyan-200 rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-600 rounded-full animate-pulse" style={{ width: '60%' }}></div>
+            </div>
+            <p className="text-slate-700 font-semibold">
+              <span aria-hidden="true">✨</span> Loading amazing opportunities...
+            </p>
+          </div>
         </div>
       </div>
     )
@@ -128,16 +197,23 @@ export default function App() {
   // ❌ Error state
   if (error && !jobs.length) {
     return (
-      <div className="h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-center max-w-md p-6 bg-white rounded-lg shadow-md">
-          <div className="text-red-500 text-5xl mb-4">⚠️</div>
-          <h2 className="text-xl font-semibold text-slate-900 mb-2">Failed to Load Jobs</h2>
-          <p className="text-slate-600 mb-4">{error}</p>
+      <div className="h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-rose-50">
+        <div className="text-center max-w-md p-8 bg-white rounded-2xl shadow-xl border border-slate-100 animate-scale-in">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-rose-100 flex items-center justify-center">
+            <svg className="w-8 h-8 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-bold text-slate-900 mb-2">Connection Error</h2>
+          <p className="text-slate-600 mb-6">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="btn-primary w-full"
           >
-            Retry
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Try Again
           </button>
         </div>
       </div>
@@ -145,15 +221,20 @@ export default function App() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-slate-50 text-slate-900">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-white via-slate-50/80 to-blue-50/50 text-slate-900 overflow-x-hidden">
       <Header query={query} setQuery={setQuery} />
+      
       {/* FILTER + SORT TOOLBAR */}
-      <div className="sticky top-0 z-10 bg-white">
+      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md">
         <div className="flex items-center justify-between">
           <Filters filters={filters} onChange={setFilters} />
-          <div className="pr-4">
+          <div className="pr-4 hidden sm:block flex-shrink-0">
             <SortBar sort={sort} onChange={setSort} />
           </div>
+        </div>
+        {/* Mobile Sort */}
+        <div className="sm:hidden px-4 pb-3">
+          <SortBar sort={sort} onChange={setSort} />
         </div>
       </div>
 
@@ -161,66 +242,114 @@ export default function App() {
       <div className="flex flex-1 max-w-7xl mx-auto w-full overflow-hidden">
 
         {/* LEFT COLUMN – Job List */}
-        <aside className="w-[45%] border-r border-slate-200 overflow-y-auto p-4 space-y-4">
+        <aside className={`${isMobile ? 'w-full' : 'w-[45%]'} overflow-y-auto p-5 space-y-4 custom-scrollbar bg-slate-50/40`}>
           {/* Pagination Info */}
           {jobs.length > 0 && (
-            <div className="text-sm text-slate-600 mb-2 flex items-center justify-between">
-              <span>
-                Showing {((page - 1) * PAGE_SIZE) + 1}-{Math.min(page * PAGE_SIZE, total)} of {total} jobs
+            <div className="flex items-center justify-between bg-white/80 backdrop-blur-sm rounded-lg px-4 py-3 shadow-xs">
+              <span className="text-[13px] font-medium text-slate-700">
+                Showing <span className="font-bold text-sky-600">{((page - 1) * PAGE_SIZE) + 1}-{Math.min(page * PAGE_SIZE, total)}</span> of <span className="font-semibold">{total}</span> jobs
               </span>
-              {fetching && <span className="text-blue-600 text-xs">Updating...</span>}
+              {fetching && (
+                <span className="flex items-center gap-2 text-sky-600 text-[13px] font-medium">
+                  <span className="w-1.5 h-1.5 bg-sky-600 rounded-full animate-pulse"></span>
+                  Updating...
+                </span>
+              )}
             </div>
           )}
 
           <JobList
             jobs={jobs}
             selectedId={selectedJob?.id}
-            onOpen={(job) => {
-              setSelectedJob(job)
-              detailsRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
-            }}
+            onOpen={handleSelectJob}
+            loading={fetching && jobs.length === 0}
           />
 
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 pt-4 pb-2">
+            <div className="flex items-center justify-center gap-3 pt-4 pb-2">
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed"
+                className="btn-secondary px-4 py-2 disabled:opacity-40 disabled:cursor-not-allowed"
               >
+                <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
                 Previous
               </button>
-              <span className="px-4 py-2 text-slate-700">
-                Page {page} of {totalPages}
-              </span>
+              
+              <div className="flex items-center gap-1">
+                {getPaginationRange(page, totalPages, 5).map(pageNum => (
+                  <button
+                    key={pageNum}
+                    onClick={() => setPage(pageNum)}
+                    className={`w-9 h-9 rounded-lg font-semibold text-sm transition-all ${
+                      page === pageNum 
+                        ? 'bg-gradient-to-br from-sky-500 to-purple-500 text-white shadow-md' 
+                        : 'text-slate-600 hover:bg-slate-100 border border-transparent hover:border-slate-200'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
+              </div>
+
               <button
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed"
+                className="btn-secondary px-4 py-2 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Next
+                <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
               </button>
             </div>
           )}
         </aside>
 
-        {/* RIGHT COLUMN – Job Details */}
-        <section
-          ref={detailsRef}
-          className="w-[55%] overflow-y-auto p-6 bg-white"
-        >
-          {selectedJob ? (
-            <DetailsPanel job={selectedJob} />
-          ) : (
-            <div className="text-center text-slate-500 mt-24">
-              Select a job to view details
-            </div>
-          )}
-        </section>
+        {/* RIGHT COLUMN – Job Details (Desktop) */}
+        {!isMobile && (
+          <section
+            ref={detailsRef}
+            className="w-[55%] overflow-y-auto bg-white custom-scrollbar pl-6"
+          >
+            {selectedJob ? (
+              <DetailsPanel job={selectedJob} />
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full text-center p-8 animate-fade-in">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center mb-4">
+                  <svg className="w-10 h-10 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">Select a job to view details</h3>
+                <p className="text-slate-500 max-w-xs">Click on any job card from the list to see the full description and apply.</p>
+              </div>
+            )}
+          </section>
+        )}
       </div>
 
-
+      {/* Mobile Detail Panel - Slide Over */}
+      {isMobile && (
+        <>
+          <div 
+            className={`mobile-overlay ${mobileDetailOpen ? 'open' : ''}`}
+            onClick={closeMobileDetail}
+          />
+          <div className={`mobile-slide-panel ${mobileDetailOpen ? 'open' : ''}`}>
+            {selectedJob && (
+              <DetailsPanel 
+                job={selectedJob} 
+                onClose={closeMobileDetail}
+                isMobile={true}
+              />
+            )}
+          </div>
+        </>
+      )}
     </div>
   )
 }
